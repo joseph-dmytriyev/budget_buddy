@@ -32,7 +32,7 @@ CREATE TABLE `compte` (
   UNIQUE KEY `numero` (`numero`),
   KEY `id_utilisateur` (`id_utilisateur`),
   CONSTRAINT `compte_ibfk_1` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,6 +41,7 @@ CREATE TABLE `compte` (
 
 LOCK TABLES `compte` WRITE;
 /*!40000 ALTER TABLE `compte` DISABLE KEYS */;
+INSERT INTO `compte` VALUES (1,'Bob Lennon',9998,1100,1),(2,'Emile Emilio',330,1750,2);
 /*!40000 ALTER TABLE `compte` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -98,7 +99,7 @@ CREATE TABLE `utilisateur` (
 
 LOCK TABLES `utilisateur` WRITE;
 /*!40000 ALTER TABLE `utilisateur` DISABLE KEYS */;
-INSERT INTO `utilisateur` VALUES (1,'Lennon','Bob','BobLennon@gmail.com','PyroB@rb@re856'),(2,'Emilio','Emile','EmilEmilio@gmail.com','Croquette.1547');
+INSERT INTO `utilisateur` VALUES (1,'Lennon','Bob','BobLennon@gmail.com','PyroB@rb@re856'),(2,'Emilio','Emile','EmilEmilio@gmail.com','Croquette1547');
 /*!40000 ALTER TABLE `utilisateur` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -111,4 +112,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-17 16:13:59
+-- Dump completed on 2025-03-18 14:24:37
