@@ -41,7 +41,7 @@ CREATE TABLE `compte` (
 
 LOCK TABLES `compte` WRITE;
 /*!40000 ALTER TABLE `compte` DISABLE KEYS */;
-INSERT INTO `compte` VALUES (1,'Bob Lennon',9998,1100,1),(2,'Emile Emilio',330,1750,2);
+INSERT INTO `compte` VALUES (1,'Bob Lennon',9998,1100,1),(2,'Emile Emilio',3030,1750,2);
 /*!40000 ALTER TABLE `compte` ENABLE KEYS */;
 UNLOCK TABLES;
 
