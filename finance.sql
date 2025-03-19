@@ -16,6 +16,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `banquier`
+--
+
+DROP TABLE IF EXISTS `banquier`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `banquier` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(255) NOT NULL,
+  `prenom` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `motdepasse` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `banquier`
+--
+
+LOCK TABLES `banquier` WRITE;
+/*!40000 ALTER TABLE `banquier` DISABLE KEYS */;
+/*!40000 ALTER TABLE `banquier` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `compte`
 --
 
@@ -89,7 +115,10 @@ CREATE TABLE `utilisateur` (
   `prenom` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `motdepasse` varchar(255) NOT NULL,
+  `id_banquier` int NOT NULL,
   PRIMARY KEY (`id`)
+  KEY `id_banquier` (`id_banquier`),
+  CONSTRAINT `utilisateur_ibfk_1` FOREIGN KEY (`id_banquier`) REFERENCES `banquier` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -99,7 +128,7 @@ CREATE TABLE `utilisateur` (
 
 LOCK TABLES `utilisateur` WRITE;
 /*!40000 ALTER TABLE `utilisateur` DISABLE KEYS */;
-INSERT INTO `utilisateur` VALUES (1,'Lennon','Bob','BobLennon@gmail.com','PyroB@rb@re856'),(2,'Emilio','Emile','EmilEmilio@gmail.com','Croquette1547');
+INSERT INTO `utilisateur` VALUES (1,'Lennon','Bob','BobLennon@gmail.com','PyroB@rb@re856',0),(2,'Emilio','Emile','EmilEmilio@gmail.com','Croquette1547',0);
 /*!40000 ALTER TABLE `utilisateur` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -112,4 +141,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-18 14:24:37
+-- Dump completed on 2025-03-19 10:57:00
