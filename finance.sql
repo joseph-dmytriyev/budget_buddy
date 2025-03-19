@@ -38,7 +38,7 @@ CREATE TABLE `banquier` (
 
 LOCK TABLES `banquier` WRITE;
 /*!40000 ALTER TABLE `banquier` DISABLE KEYS */;
-INSERT INTO `utilisateur` VALUES (1,'Fantasio','Gomeze','fantasio974@gmail.com','666.crYpto');
+INSERT INTO `banquier` VALUES (1,'Fantasio','Gomeze','fantasio974@gmail.com','666.crYpto');
 /*!40000 ALTER TABLE `banquier` ENABLE KEYS */;
 UNLOCK TABLES;
 
