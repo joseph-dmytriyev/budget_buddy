@@ -38,6 +38,7 @@ CREATE TABLE `banquier` (
 
 LOCK TABLES `banquier` WRITE;
 /*!40000 ALTER TABLE `banquier` DISABLE KEYS */;
+INSERT INTO `utilisateur` VALUES (1,'Fantasio','Gomeze','fantasio974@gmail.com','666.crYpto');
 /*!40000 ALTER TABLE `banquier` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,7 +129,7 @@ CREATE TABLE `utilisateur` (
 
 LOCK TABLES `utilisateur` WRITE;
 /*!40000 ALTER TABLE `utilisateur` DISABLE KEYS */;
-INSERT INTO `utilisateur` VALUES (1,'Lennon','Bob','BobLennon@gmail.com','PyroB@rb@re856',0),(2,'Emilio','Emile','EmilEmilio@gmail.com','Croquette1547',0);
+INSERT INTO `utilisateur` VALUES (1,'Lennon','Bob','BobLennon@gmail.com','PyroB@rb@re856',1),(2,'Emilio','Emile','EmilEmilio@gmail.com','Croquette1547',1);
 /*!40000 ALTER TABLE `utilisateur` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
