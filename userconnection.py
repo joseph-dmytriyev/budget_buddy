@@ -14,6 +14,8 @@ pepper = os.getenv("PEPPER")
 class User:
     def __init__(self, db: Database):
         self.db = db
+        self.user_id = None
+        self.admin_id = None
 
     def hash_password(self, password, salt):
         """To hash the user password."""
@@ -69,11 +71,11 @@ class User:
         cursor = self.db.get_cursor()
 
         try:
-            cursor.execute("SELECT nom, prenom, motdepasse, salt FROM utilisateur WHERE email = %s", (email,))
+            cursor.execute("SELECT id, nom, prenom, motdepasse, salt FROM utilisateur WHERE email = %s", (email,))
             result = cursor.fetchone()
 
             if result:
-                nom, prenom, stored_password, salt = result
+                self.user_id, nom, prenom, stored_password, salt = result
                 hashed_password = self.hash_password(motdepasse, salt)
 
                 if stored_password == hashed_password:
@@ -95,11 +97,11 @@ class User:
         cursor = self.db.get_cursor()
 
         try:
-            cursor.execute("SELECT nom, prenom, motdepasse, salt FROM banquier WHERE email = %s", (email,))
+            cursor.execute("SELECT id, nom, prenom, motdepasse, salt FROM banquier WHERE email = %s", (email,))
             result = cursor.fetchone()
 
             if result:
-                nom, prenom, stored_password, salt = result
+                self.admin_id, nom, prenom, stored_password, salt = result
                 hashed_password = self.hash_password(motdepasse, salt)
                 
                 if stored_password == hashed_password:
