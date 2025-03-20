@@ -1,19 +1,11 @@
 import customtkinter as ctk
-import mysql.connector
 import random
+from database import Database
+from userconnection import User
 
 
-
-try:
-    db = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="godsAvou1r",
-        database="finance"
-    )
-except mysql.connector.Error as err:
-    print(f"Erreur de connexion à la base de données: {err}")
-    exit()
+db_instance = Database()
+user_instance = User(db_instance)
 
 # Configuration de la fenêtre principale
 ctk.set_appearance_mode("dark")  
@@ -26,32 +18,37 @@ class FinanceApp(ctk.CTk):
         self.title("Application Bancaire")
         self.geometry("600x500")
         self.resizable(False, False)
-        self.page_accueil()
-        
-   
+        self.user_id = None
+        self.page_login() 
+    
+    #def page_login(self):
+      # to do or transform page_accueil
+
+    
+    # def register_new_account
+
 
     def generate_unique_reference(self):
     
         while True:
             reference = random.randint(10**9, 10**10 - 1) % (10**6)
 
-            cursor = db.cursor()
+            cursor = self.db.get_cursor()
             cursor.execute("SELECT reference FROM transaction WHERE reference = %s", (reference,))
             if not cursor.fetchone():  # Vérifie si la référence existe déjà
                 cursor.close()
                 return reference
             cursor.close()
 
-
     def get_user(self):
-        cursor = db.cursor()
+        cursor = self.db.get_cursor()
         cursor.execute("SELECT id, nom, prenom FROM utilisateur")
         users = cursor.fetchall()
         cursor.close()
         return users
 
     def get_account(self, user_id):
-        cursor = db.cursor()
+        cursor = self.db.get_cursor()
         cursor.execute("SELECT id, nom, numero, montant FROM compte WHERE id_utilisateur = %s", (user_id,))
         compte = cursor.fetchone()
         cursor.close()
@@ -165,7 +162,7 @@ class FinanceApp(ctk.CTk):
         if montant <= 0:
             return
     
-        cursor = db.cursor()
+        cursor = self.db.get_cursor()
         reference = self.generate_unique_reference()
     
         try:
@@ -198,7 +195,7 @@ class FinanceApp(ctk.CTk):
                 cursor.execute("INSERT INTO transaction (reference, description, montant, date, type, id_compte) VALUES (%s, %s, %s, NOW(), %s, %s)",
                                (reference, "Virement vers compte " + str(compte_dest), montant, "virement", compte_id))
     
-            db.commit()
+            self.db.db.commit()
         except Exception as e:
             print(f"Erreur lors de la transaction : {e}")
         finally:
@@ -206,9 +203,6 @@ class FinanceApp(ctk.CTk):
     
         self.page_compte(compte_id)
     
-    
-            
-
     def afficher_historique(self, compte_id):
         # Supprimer les widgets existants
         for widget in self.winfo_children():
@@ -216,7 +210,7 @@ class FinanceApp(ctk.CTk):
     
         try:
             # Connexion à la base de données et exécution de la requête
-            cursor = db.cursor()
+            cursor = self.db.get_cursor()
             cursor.execute("SELECT type, montant, date FROM transaction WHERE id_compte = %s ORDER BY date DESC", (compte_id,))
             transactions = cursor.fetchall()
             cursor.close()
