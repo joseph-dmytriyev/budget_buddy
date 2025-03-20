@@ -26,7 +26,7 @@ class FinancialReport:
             cursor.execute('''
                 SELECT SUM(montant) AS total_recettes
                 FROM transaction
-                WHERE type = 'dépôt'
+                WHERE type = 'depot'
                     AND user_id = %s
                     AND MONTH(date) = %s 
                     AND YEAR(date) = %s;
