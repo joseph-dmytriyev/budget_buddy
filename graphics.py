@@ -35,7 +35,7 @@ class Graphics:
         finally:
             cursor.close()
 
-    def get_monthly_expensed(self, month: int, year: int):
+    def get_monthly_expenses(self, month: int, year: int):
         """To get the monthly expenses for the selected month"""
         try:
             cursor = self.db.get_cursor()
@@ -71,8 +71,41 @@ class Graphics:
             return result[0] if result[0] is not None else 0            
         except mysql.connector.Error as error:
             messagebox.showerror("Erreur", f"Erreur lors de l'éxécution de la requête ; {error}")
+            return None
         finally:
             cursor.close()
+
+    def plot_yearly_financials(self):
+        """Plot the balances, expenses and income for the current year"""
+       
+        current_year = datetime.now().year
+        months = list(range(1,13))
+        incomes = []
+        expenses = []
+        balances =[]
+
+        for month in months:
+            total_income = self.get_monthly_income(month, current_year)
+            total_expenses = self.get_monthly_expenses(month, current_year)
+            monthly_balance = total_income - total_expenses
+
+            incomes.append(total_income)
+            expenses.append(total_expenses)
+            balances.append(monthly_balance)
+
+        plt.figure(figsize=(10,6))
+        plt.plot(months, incomes, label='Recettes', color='green', marker='o')
+        plt.plot(months, expenses, label='Dépenses', color='red', marker='o')
+        plt.plot(months, balances, label="Solde", color='blue', marker='o')
+        plt.title(f"Aperçu financier des recettes, dépenses et solde pour {current_year}")
+        plt.xlabel('Mois')
+        plt.ylabel('Montant')
+        plt.xsticks(months, ['Janv', 'Févr', 'Mars', 'Avr', 'Mai', 'Juin', 'Juill', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'])
+        plt.legend()
+        plt.grid()
+        plt.tight_layout()
+        plt.show()
+
 
 
     
