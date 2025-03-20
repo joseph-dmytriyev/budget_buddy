@@ -248,8 +248,6 @@ class FinanceApp(ctk.CTk):
         ).pack(pady=20)
 
 
-                    
-
 if __name__ == "__main__":
     app = FinanceApp()
     app.mainloop()
