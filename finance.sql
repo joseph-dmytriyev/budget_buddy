@@ -90,7 +90,7 @@ CREATE TABLE `transaction` (
   `id_compte` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `reference` (`reference`),
-  KEY `id_compte` (`id_transaction`),
+  KEY `id_compte` (`id_compte`),
   CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`id_compte`) REFERENCES `compte` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
