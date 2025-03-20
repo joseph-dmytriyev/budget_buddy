@@ -2,15 +2,16 @@ import os
 import mysql.connector
 from dotenv import load_dotenv
 from database import Database
-import tkinter as tk
 from tkinter import messagebox
+from userconnection import User
 
 load_dotenv()
 passw = os.getenv("PASSWORD")
 
 class FinancialReport:
-    def __init__(self, db: Database):
+    def __init__(self, db: Database, user_id: int):
         self.db = db
+        self.user_id = user_id
 
     def get_monthly_income(self, month: int, year: int):
         """ Get the user income for the selected month """
@@ -26,9 +27,10 @@ class FinancialReport:
                 SELECT SUM(montant) AS total_recettes
                 FROM transaction
                 WHERE type = 'dépôt'
-                  AND MONTH(date) = %s 
-                  AND YEAR(date) = %s;
-            ''', (month, year))
+                    AND user_id = %s
+                    AND MONTH(date) = %s 
+                    AND YEAR(date) = %s;
+            ''', (self.user_id, month, year))
 
             result = cursor.fetchone()
             total_income = result[0] if result[0] is not None else 0  
@@ -55,9 +57,10 @@ class FinancialReport:
                 SELECT SUM(montant) AS total_expenses
                 FROM transaction
                 WHERE (type = 'retrait' OR type = 'transfert')
-                  AND MONTH(date) = %s 
-                  AND YEAR(date) = %s;
-            ''', (month, year))
+                    AND user_id = %s
+                    AND MONTH(date) = %s 
+                    AND YEAR(date) = %s;
+            ''', (self.user_id, month, year))
 
             result = cursor.fetchone()
             total_expenses = result[0] if result[0] is not None else 0  
