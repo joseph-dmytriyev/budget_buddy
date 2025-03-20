@@ -54,5 +54,25 @@ class Graphics:
             return None
         finally:
             cursor.close()
-            
+
+    def get_monthly_transaction_total(self, transaction_type : str, month: int, year: int):
+        """ To get the total amount of transaction for a specific type"""
+        try:
+            cursor = self.db.get_cursor()
+            cursor.execute('''
+                SELECT SUM(montant) AS total_amount
+                    FROM transaction
+                    WHERE type = %s
+                    AND user_id = %s
+                    AND MONTH(date) = %s
+                    AND YEAR(date) = %s;     
+            ''', (transaction_type, self.user_id, month, year))
+            result = cursor.fetchone()
+            return result[0] if result[0] is not None else 0            
+        except mysql.connector.Error as error:
+            messagebox.showerror("Erreur", f"Erreur lors de l'éxécution de la requête ; {error}")
+        finally:
+            cursor.close()
+
+
     
