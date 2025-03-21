@@ -82,12 +82,13 @@ class User:
 
                 if stored_password == hashed_password:
                     messagebox.showinfo("Bonjour", f"Bienvenue {prenom} {nom}!")
+                    return True
                 else:
                     messagebox.showerror("Erreur", "Le mot de passe est incorrect.")
-                    return None
+                    return False
             else:
                 messagebox.showerror("Erreur", "Cet e-mail n'est pas enregistré.")
-                return None
+                return False
 
         except mysql.connector.Error as error:
             messagebox.showerror("Erreur", f"Erreur lors de la connexion {error}")
@@ -108,12 +109,13 @@ class User:
                 
                 if stored_password == hashed_password:
                     messagebox.showinfo("Bonjour", f"Bienvenue {prenom} {nom}!")
+                    return True
                 else:
                     messagebox.showerror("Erreur", "Le mot de passe est incorrect.")
-                    return None
+                    return False
             else:
                 messagebox.showerror("Erreur", "Cet e-mail d'administrateur n'est pas enregistré.")
-                return None
+                return False
 
         except mysql.connector.Error as error:
             messagebox.showerror("Erreur", f"Erreur lors de la connexion admin {error}")
