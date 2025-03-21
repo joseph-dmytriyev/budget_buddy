@@ -38,7 +38,14 @@ class FinanceApplogin(ctk.CTk):
     
     
     def perform_login(self):
-        pass
+        """Execute login user method if all conditions are ok"""
+        email = self.email_entry.get()
+        password = self.password_entry.get()
+        self.user_instance.login_user(email, password)
+        
+        if self.user_instance.user_id:
+            self.user_id = self.user_instance.user_id
+            # add here method to go to the next step
 
     def register_page(self):
         pass
