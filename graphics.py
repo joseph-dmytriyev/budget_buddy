@@ -11,7 +11,7 @@ load_dotenv()
 pasw = os.getenv("PASSWORD")
 
 class Graphics:
-    def __init_(self, db : Database, user_id : int):
+    def __init__(self, db : Database, user_id : int):
         self.db = db
         self.user_id = user_id
 
