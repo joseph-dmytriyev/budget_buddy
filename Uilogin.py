@@ -48,7 +48,38 @@ class FinanceApplogin(ctk.CTk):
             # add here method to go to the next step
 
     def register_page(self):
+        """Ui register page"""
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        ctk.CTkLabel(self, text = "Créer un compte", font=("Arial", 24, "bold")).pack(pady=25)
+        
+        ctk.CTkLabel(self, text = "Nom").pack(pady=5)
+        self.name_entry = ctk.CTkEntry(self)
+        self.name_entry.pack(pady = 5)
+
+        ctk.CTkLabel(self, text="Prénom").pack(pady=5)
+        self.surname_entry = ctk.CTkEntry(self)
+        self.surname_entry.pack(pady= 5)
+
+        ctk.CTkLabel(self, text="Email").pack(pady=5)
+        self.register_email_entry = ctk.CTkEntry(self)
+        self.register_email_entry.pack(pady= 5)
+
+        ctk.CTkLabel(self, text= "Password").pack(pady=5)
+        self.register_password_entry = ctk.CTkEntry(self, show="*")
+        self.register_password_entry.pack(pady=5)
+
+        ctk.CTkButton(self, text="S'INSCRIRE", command=self.create_account).pack(pady=15)
+
+        back_link = ctk.CTkLabel(self, text="Retour à la page de connexion", text_color="white", cursor="hand2")
+        back_link.pack(pady=10)
+
+        back_link.bind("<Button-1>", lambda e: self.login_page())
+
+    def create_account(self):
         pass
+
 
 if __name__ == "__main__":
     app = FinanceApplogin()
