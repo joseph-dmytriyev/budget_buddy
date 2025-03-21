@@ -45,11 +45,11 @@ class User:
         
         if not self.validate_email(email):
             messagebox.showerror("Erreur", "L'adresse e-mail fournie n'est pas valide.")
-            return
+            return False
 
         if not self.validate_password(motdepasse):
             messagebox.showerror("Erreur", "Le mot de passe doit contenir au moins 10 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
-            return
+            return False
         
         salt = self.generate_salt() 
         hashed_password = self.hash_password(motdepasse, salt)
@@ -60,8 +60,10 @@ class User:
                             (nom, prenom, email, hashed_password, salt))
             self.db.db.commit()
             messagebox.showinfo("Succès", "Utilisateur enregistré avec succès!")
+            return True
         except mysql.connector.Error as error:
             messagebox.showerror("Erreur", f"Erreur d'inscription : {error}")
+            return False
         finally:
             cursor.close()
 
