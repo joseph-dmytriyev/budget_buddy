@@ -15,14 +15,88 @@ except mysql.connector.Error as err:
     print(f"Erreur de connexion à la base de données: {err}")
     exit()
 
-# Configde  fenêtre principale
+# Configuration de la fenêtre principale
 ctk.set_appearance_mode("dark")  
 ctk.set_default_color_theme("blue")
+
+
+
+class AdminPage(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.configure(fg_color="white")  
+
+        ctk.CTkLabel(self, text="Mode Administrateur", font=("Arial", 22, "bold"), text_color="red").pack(pady=20)
+
+        
+        self.frame_comptes = ctk.CTkScrollableFrame(self, width=500, height=300, fg_color="white")
+        self.frame_comptes.pack(pady=20, padx=20, fill="both", expand=True)
+
+        self.charger_comptes()  
+
+        
+        ctk.CTkButton(
+            self,
+            text="🚪 Déconnexion Admin",
+            command=self.controller.disable_admin_mode,
+            height=40,
+            fg_color="red",
+            hover_color="darkred",
+            text_color="white",
+            font=("Arial", 16, "bold")
+        ).pack(pady=20)
+
+    def charger_comptes(self):
+        
+        try:
+            
+            for widget in self.frame_comptes.winfo_children():
+                widget.destroy()
+
+            
+            cursor = db.cursor()
+            cursor.execute("SELECT id, nom, numero, montant FROM compte")
+            comptes = cursor.fetchall()
+            cursor.close()
+
+            for compte_id, nom, numero, montant in comptes:
+                texte = f"{nom} (N°{numero}) - Solde: {montant} €"
+                cadre_compte = ctk.CTkFrame(self.frame_comptes, fg_color="lightgray", corner_radius=10)
+                cadre_compte.pack(pady=5, padx=10, fill="x")
+
+                ctk.CTkLabel(cadre_compte, text=texte, font=("Arial", 16, "bold"), text_color="black").pack(side="left", padx=10)
+
+                
+                button_frame = ctk.CTkScrollableFrame(cadre_compte, width=450, height=50, fg_color="white", orientation="horizontal")
+                button_frame.pack(pady=10, padx=10, fill="x")
+
+                
+                ctk.CTkButton(button_frame, text="💵 Dépôt", fg_color="green", hover_color="darkgreen",command=lambda id=compte_id: self.effectuer_transaction(id, "depot")).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="💸 Retrait", fg_color="blue", hover_color="darkblue",command=lambda id=compte_id: self.effectuer_transaction(id, "retrait")).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="🔄 Virement", fg_color="orange", hover_color="darkorange",command=lambda id=compte_id: self.effectuer_transaction(id, "virement")).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="📜 Historique", fg_color="purple", hover_color="darkpurple",command=lambda id=compte_id: self.controller.afficher_historique(id)).pack(side="left", padx=2)
+
+        except Exception as e:
+            print(f"Erreur lors du chargement des comptes : {e}")
+
+    def effectuer_transaction(self, compte_id, type_operation):
+        
+        self.controller.transaction(compte_id, type_operation)
+        self.charger_comptes()  
+
+
+
+
+
+
 
 
 class FinanceApp(ctk.CTk):
     def __init__(self):
         super().__init__()
+        self.admin_mode = False
+        self.page_accueil()  
         self.title("Application Bancaire")
         self.geometry("600x500")
         self.resizable(False, False)
@@ -30,18 +104,37 @@ class FinanceApp(ctk.CTk):
         
    
 
+   
+    def enable_admin_mode(self):
+        
+        self.admin_mode = True
+        self.show_admin_page()
+
+    def disable_admin_mode(self):
+        
+        self.admin_mode = False
+        self.page_accueil()
+
+    def show_admin_page(self):
+        
+        if self.admin_mode:
+            for widget in self.winfo_children():
+                widget.destroy()
+            admin_page = AdminPage(self, self)
+            admin_page.pack(fill="both", expand=True)
+
+     
     def generate_unique_reference(self):
-    
-        while True:
-            reference = random.randint(10**9, 10**10 - 1) % (10**6)
+     
+         while True:
+             reference = random.randint(10**9, 10**10 - 1) % (10**6)
 
-            cursor = db.cursor()
-            cursor.execute("SELECT reference FROM transaction WHERE reference = %s", (reference,))
-            if not cursor.fetchone():  # Vérifie si la référence existe déjà
-                cursor.close()
-                return reference
-            cursor.close()
-
+             cursor = db.cursor()
+             cursor.execute("SELECT reference FROM transaction WHERE reference = %s", (reference,))
+             if not cursor.fetchone():  
+                 cursor.close()
+                 return reference
+             cursor.close()
 
     def get_user(self):
         cursor = db.cursor()
@@ -80,6 +173,11 @@ class FinanceApp(ctk.CTk):
                 command=lambda u=user_id: self.page_compte(u)
             )
             button.pack(pady=10, padx=10, anchor="center")
+        
+        ctk.CTkButton(self, text="🔑 Mode Admin", command=self.enable_admin_mode,
+              height=40, fg_color="red", hover_color="darkred",
+              font=("Arial", 16, "bold")).pack(pady=10)
+
 
     def page_compte(self, user_id):
         for widget in self.winfo_children():
@@ -204,38 +302,41 @@ class FinanceApp(ctk.CTk):
         finally:
             cursor.close()
     
-        self.page_compte(compte_id)
+        if self.admin_mode:
+           self.show_admin_page()
+        else:
+           self.page_compte(compte_id)
     
     
             
 
     def afficher_historique(self, compte_id):
-        # Supprimer les widgets existants
+        
         for widget in self.winfo_children():
             widget.destroy()
     
         try:
-            # Connexion base de données et requete
+            
             cursor = db.cursor()
             cursor.execute("SELECT reference, type, montant, date FROM transaction WHERE id_compte = %s ORDER BY date DESC", (compte_id,))
             transactions = cursor.fetchall()
             cursor.close()
     
-            # Vérifie les transac récupérées
+            # Vérification
             print("Transactions récupérées :", transactions)
     
         except Exception as e:
             print(f"Erreur lors de la récupération des transactions : {e}")
             transactions = []
     
-        # Créer le label 
+        # label historique 
         ctk.CTkLabel(self, text="Historique des Transactions", font=("Arial", 22, "bold")).pack(pady=20)
     
-        # Créer un cadre pour l'historique des transactions
+        #  cadre historique 
         frame_historique = ctk.CTkScrollableFrame(self, width=500, height=300)
         frame_historique.pack(pady=20, padx=20, fill="both", expand=True)
     
-        # Afficher les transactions
+        # Affiche transactions
         if transactions:
             for reference, type_transaction, montant, date in transactions:
                 ctk.CTkLabel(frame_historique, text=f"{date} - Réf: {reference} - {type_transaction} : {montant} €",
@@ -243,7 +344,7 @@ class FinanceApp(ctk.CTk):
         else:
             ctk.CTkLabel(frame_historique, text="Aucune transaction trouvée", font=("Arial", 18, "bold"), text_color="red").pack(pady=20)
     
-        # bouton de retour
+        
         ctk.CTkButton(
             self,
             text="↩ Retour",
