@@ -82,7 +82,7 @@ class User:
 
                 if stored_password == hashed_password:
                     messagebox.showinfo("Bonjour", f"Bienvenue {prenom} {nom}!")
-                    return True
+                    return self.user_id
                 else:
                     messagebox.showerror("Erreur", "Le mot de passe est incorrect.")
                     return False
@@ -109,7 +109,7 @@ class User:
                 
                 if stored_password == hashed_password:
                     messagebox.showinfo("Bonjour", f"Bienvenue {prenom} {nom}!")
-                    return True
+                    return self.admin_id
                 else:
                     messagebox.showerror("Erreur", "Le mot de passe est incorrect.")
                     return False
