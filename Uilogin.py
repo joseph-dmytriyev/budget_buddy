@@ -13,6 +13,7 @@ class FinanceApplogin(ctk.CTk):
         self.user_id = None
         self.db_instance = Database()
         self.user_instance = User(self.db_instance)
+        self.admin_instance = User(self.db_instance)
         self.login_page()
 
     def login_page(self):
@@ -111,7 +112,15 @@ class FinanceApplogin(ctk.CTk):
         ctk.CTkButton(self, text = "SE CONNECTER", command=self.perform_admin_login).pack(pady=10)         
 
     def perform_admin_login(self):
-        pass
+        """Perform admin login when all conditions are ok"""
+        email = self.admin_email_entry.get()
+        motdepasse = self.admin_password_entry.get()
+
+        self.admin_instance.admin_login(email, motdepasse)
+        
+        if self.admin_instance.admin_id:
+            self.admin_id = self.admin_instance.admin_id
+            # add here method to go to the next step
 
 if __name__ == "__main__":
     app = FinanceApplogin()
