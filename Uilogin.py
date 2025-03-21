@@ -36,7 +36,11 @@ class FinanceApplogin(ctk.CTk):
 
         ctk.CTkButton(self, text="S'INSCRIRE", command=self.register_page).pack(pady=10)        
     
-    
+        admin_link = ctk.CTkLabel(self, text="Admin connexion", text_color="white", cursor="hand2")
+        admin_link.pack(pady=10)
+
+        admin_link.bind("<Button-1>", lambda e: self.admin_page())
+
     def perform_login(self):
         """Execute login user method if all conditions are ok"""
         email = self.email_entry.get()
@@ -66,7 +70,7 @@ class FinanceApplogin(ctk.CTk):
         self.register_email_entry = ctk.CTkEntry(self)
         self.register_email_entry.pack(pady= 5)
 
-        ctk.CTkLabel(self, text= "Password").pack(pady=5)
+        ctk.CTkLabel(self, text= "Mot de passe").pack(pady=5)
         self.register_password_entry = ctk.CTkEntry(self, show="*")
         self.register_password_entry.pack(pady=5)
 
@@ -78,8 +82,36 @@ class FinanceApplogin(ctk.CTk):
         back_link.bind("<Button-1>", lambda e: self.login_page())
 
     def create_account(self):
-        pass
+        """To register the new user in database"""
+        nom = self.name_entry.get()
+        prenom = self.surname_entry.get()
+        email = self.register_email_entry.get()
+        motdepasse = self.register_password_entry.get()
 
+        registration_success = self.user_instance.register_user(nom, prenom, email, motdepasse)
+        if registration_success:
+            messagebox.showinfo("Succès", "Vous êtes enregisté !")
+            self.login_page()
+
+    def admin_page(self):
+        """Ui admin """
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        ctk.CTkLabel(self, text="ADMIN CONNEXION", font=("Arial", 24, "bold")).pack(pady=25)
+
+        ctk.CTkLabel(self, text="Email").pack(pady=5) 
+        self.admin_email_entry = ctk.CTkEntry(self)
+        self.admin_email_entry.pack(pady=10) 
+
+        ctk.CTkLabel(self, text= "Mot de passe").pack(pady=5)
+        self.admin_password_entry = ctk.CTkEntry(self, show="*")
+        self.admin_password_entry.pack(pady = 10) 
+
+        ctk.CTkButton(self, text = "SE CONNECTER", command=self.perform_admin_login).pack(pady=10)         
+
+    def perform_admin_login(self):
+        pass
 
 if __name__ == "__main__":
     app = FinanceApplogin()
