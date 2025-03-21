@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import mysql.connector
 import random
+import CTkMessagebox
 
 
 
@@ -30,10 +31,10 @@ class AdminPage(ctk.CTkFrame):
         ctk.CTkLabel(self, text="Mode Administrateur", font=("Arial", 22, "bold"), text_color="red").pack(pady=20)
 
         
-        self.frame_comptes = ctk.CTkScrollableFrame(self, width=500, height=300, fg_color="white")
-        self.frame_comptes.pack(pady=20, padx=20, fill="both", expand=True)
+        self.frame_account = ctk.CTkScrollableFrame(self, width=500, height=300, fg_color="white")
+        self.frame_account.pack(pady=20, padx=20, fill="both", expand=True)
 
-        self.charger_comptes()  
+        self.load_account()  
 
         
         ctk.CTkButton(
@@ -47,43 +48,43 @@ class AdminPage(ctk.CTkFrame):
             font=("Arial", 16, "bold")
         ).pack(pady=20)
 
-    def charger_comptes(self):
+    def load_account(self):
         
         try:
             
-            for widget in self.frame_comptes.winfo_children():
+            for widget in self.frame_account.winfo_children():
                 widget.destroy()
 
             
             cursor = db.cursor()
             cursor.execute("SELECT id, nom, numero, montant FROM compte")
-            comptes = cursor.fetchall()
+            account = cursor.fetchall()
             cursor.close()
 
-            for compte_id, nom, numero, montant in comptes:
-                texte = f"{nom} (N°{numero}) - Solde: {montant} €"
-                cadre_compte = ctk.CTkFrame(self.frame_comptes, fg_color="lightgray", corner_radius=10)
-                cadre_compte.pack(pady=5, padx=10, fill="x")
+            for compte_id, nom, numero, montant in account:
+                text = f"{nom} (N°{numero}) - Solde: {montant} €"
+                frame_account = ctk.CTkFrame(self.frame_account, fg_color="lightgray", corner_radius=10)
+                frame_account.pack(pady=5, padx=10, fill="x")
 
-                ctk.CTkLabel(cadre_compte, text=texte, font=("Arial", 16, "bold"), text_color="black").pack(side="left", padx=10)
+                ctk.CTkLabel(frame_account, text=text, font=("Arial", 16, "bold"), text_color="black").pack(side="left", padx=10)
 
                 
-                button_frame = ctk.CTkScrollableFrame(cadre_compte, width=450, height=50, fg_color="white", orientation="horizontal")
+                button_frame = ctk.CTkScrollableFrame(frame_account, width=450, height=50, fg_color="white", orientation="horizontal")
                 button_frame.pack(pady=10, padx=10, fill="x")
 
                 
-                ctk.CTkButton(button_frame, text="💵 Dépôt", fg_color="green", hover_color="darkgreen",command=lambda id=compte_id: self.effectuer_transaction(id, "depot")).pack(side="left", padx=2)
-                ctk.CTkButton(button_frame, text="💸 Retrait", fg_color="blue", hover_color="darkblue",command=lambda id=compte_id: self.effectuer_transaction(id, "retrait")).pack(side="left", padx=2)
-                ctk.CTkButton(button_frame, text="🔄 Virement", fg_color="orange", hover_color="darkorange",command=lambda id=compte_id: self.effectuer_transaction(id, "virement")).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="💵 Dépôt", fg_color="green", hover_color="darkgreen",command=lambda id=compte_id: self.perform_transaction(id, "depot")).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="💸 Retrait", fg_color="blue", hover_color="darkblue",command=lambda id=compte_id: self.perform_transaction(id, "retrait")).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="🔄 Virement", fg_color="orange", hover_color="darkorange",command=lambda id=compte_id: self.perform_transaction(id, "virement")).pack(side="left", padx=2)
                 ctk.CTkButton(button_frame, text="📜 Historique", fg_color="purple", hover_color="darkpurple",command=lambda id=compte_id: self.controller.afficher_historique(id)).pack(side="left", padx=2)
 
         except Exception as e:
             print(f"Erreur lors du chargement des comptes : {e}")
 
-    def effectuer_transaction(self, compte_id, type_operation):
+    def perform_transaction(self, compte_id, type_operator):
         
-        self.controller.transaction(compte_id, type_operation)
-        self.charger_comptes()  
+        self.controller.transaction(compte_id, type_operator)
+        self.load_account()  
 
 
 
@@ -96,11 +97,11 @@ class FinanceApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.admin_mode = False
-        self.page_accueil()  
+        self.home_page()  
         self.title("Application Bancaire")
         self.geometry("600x500")
         self.resizable(False, False)
-        self.page_accueil()
+        self.home_page()
         
    
 
@@ -113,7 +114,7 @@ class FinanceApp(ctk.CTk):
     def disable_admin_mode(self):
         
         self.admin_mode = False
-        self.page_accueil()
+        self.home_page()
 
     def show_admin_page(self):
         
@@ -127,7 +128,7 @@ class FinanceApp(ctk.CTk):
     def generate_unique_reference(self):
      
          while True:
-             reference = random.randint(10**9, 10**10 - 1) % (10**6)
+             reference = random.randint(10**6, 10**7 - 1)
 
              cursor = db.cursor()
              cursor.execute("SELECT reference FROM transaction WHERE reference = %s", (reference,))
@@ -150,7 +151,7 @@ class FinanceApp(ctk.CTk):
         cursor.close()
         return compte
 
-    def page_accueil(self):
+    def home_page(self):
         for widget in self.winfo_children():
             widget.destroy()
 
@@ -248,14 +249,14 @@ class FinanceApp(ctk.CTk):
         ctk.CTkButton(
             self,
             text="↩ Retour",
-            command=self.page_accueil,
+            command=self.home_page,
             height=40,
             fg_color="blue",
             hover_color="darkblue",
             font=("Arial", 16, "bold")
         ).pack(pady=20)
 
-    def transaction(self, compte_id, type_operation):
+    def transaction(self, compte_id, type_operator):
         montant_input = ctk.CTkInputDialog(title="Montant", text="Entrez le montant :").get_input()
         if not montant_input or not montant_input.isdigit():
             return
@@ -267,29 +268,29 @@ class FinanceApp(ctk.CTk):
         reference = self.generate_unique_reference()
     
         try:
-            if type_operation == "depot":
+            if type_operator == "depot":
                 cursor.execute("UPDATE compte SET montant = montant + %s WHERE id = %s", (montant, compte_id))
                 cursor.execute("INSERT INTO transaction (reference, description, montant, date, type, id_compte) VALUES (%s, %s, %s, NOW(), %s, %s)",
                                (reference, "Dépôt d'argent", montant, "dépot", compte_id))
-            elif type_operation == "retrait":
+            elif type_operator == "retrait":
                 cursor.execute("SELECT montant FROM compte WHERE id = %s", (compte_id,))
                 solde_actuel = cursor.fetchone()[0]
                 if montant > solde_actuel:
-                    ctk.CTkMessagebox.show_error("Erreur", "Solde insuffisant")
+                    CTkMessagebox.show_error("Erreur", "Solde insuffisant")
                     return
                 cursor.execute("UPDATE compte SET montant = montant - %s WHERE id = %s", (montant, compte_id))
                 cursor.execute("INSERT INTO transaction (reference, description, montant, date, type, id_compte) VALUES (%s, %s, %s, NOW(), %s, %s)",
                                (reference, "Retrait d'argent", montant, "retrait", compte_id))
-            elif type_operation == "virement":
+            elif type_operator == "virement":
                 compte_dest_input = ctk.CTkInputDialog(title="Virement", text="Entrez l'ID du compte destinataire :").get_input()
                 if not compte_dest_input or not compte_dest_input.isdigit():
-                    ctk.CTkMessagebox.show_error("Erreur", "ID de compte destinataire invalide")
+                    CTkMessagebox.show_error("Erreur", "ID de compte destinataire invalide")
                     return
                 compte_dest = int(compte_dest_input)
                 cursor.execute("SELECT montant FROM compte WHERE id = %s", (compte_id,))
                 solde_actuel = cursor.fetchone()[0]
                 if montant > solde_actuel:
-                    ctk.CTkMessagebox.show_error("Erreur", "Solde insuffisant")
+                    CTkMessagebox.show_error("Erreur", "Solde insuffisant")
                     return
                 cursor.execute("UPDATE compte SET montant = montant - %s WHERE id = %s", (montant, compte_id))
                 cursor.execute("UPDATE compte SET montant = montant + %s WHERE id = %s", (montant, compte_dest))
