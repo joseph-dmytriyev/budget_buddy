@@ -2,6 +2,7 @@ import customtkinter as ctk
 from userconnection import User
 from database import Database
 from tkinter import messagebox
+from projet_gestion_bancaire import FinanceApp
 
 
 class FinanceApplogin(ctk.CTk):
@@ -14,6 +15,7 @@ class FinanceApplogin(ctk.CTk):
         self.db_instance = Database()
         self.user_instance = User(self.db_instance)
         self.admin_instance = User(self.db_instance)
+        self.finance_app = FinanceApp()
         self.login_page()
 
     def login_page(self):
@@ -50,7 +52,7 @@ class FinanceApplogin(ctk.CTk):
         
         if self.user_instance.user_id:
             self.user_id = self.user_instance.user_id
-            # add here method to go to the next step
+            self.finance_app.page_compte(self.user_id)
 
     def register_page(self):
         """Ui register page"""
@@ -120,7 +122,7 @@ class FinanceApplogin(ctk.CTk):
 
         if self.admin_instance.admin_id:
             self.admin_id = self.admin_instance.admin_id
-            # add here method to go to the next step
+            self.finance_app.enable_admin_mode()
 
 if __name__ == "__main__":
     app = FinanceApplogin()
