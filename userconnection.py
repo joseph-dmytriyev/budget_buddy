@@ -3,6 +3,7 @@ import mysql.connector
 import hashlib
 import secrets
 from dotenv import load_dotenv
+import random
 from database import Database
 from tkinter import messagebox
 import re
@@ -25,6 +26,10 @@ class User:
         "generate random salt"
         return secrets.token_hex(16)
     
+    def generate_account_number(self):
+        "generate 4 randomm numbers"
+        return random.randint(1000, 9999)
+    
     def validate_password(self, motdepasse):
         """To validate the password before hashing and registering in the database."""
         if (len(motdepasse) < 10 or 
@@ -40,11 +45,11 @@ class User:
         email_regex = re.compile(r"[^@]+@[^@]+\.[^@]+")
         return re.match(email_regex, email) is not None
     
-    def register_user(self, nom, prenom, email, motdepasse):
+    def register_user(self, nom, prenom, email, motdepasse, id_banquier=1):
         """To register a new user."""
         
         if not self.validate_email(email):
-            messagebox.showerror("Erreur", "L'adresse e-mail fournie n'est pas valide.")
+            messagebox.showerror("Erreur", "L'adresse e-mail fourni n'est pas valide.")
             return False
 
         if not self.validate_password(motdepasse):
@@ -56,9 +61,15 @@ class User:
         cursor = self.db.get_cursor()
 
         try:
-            cursor.execute("INSERT INTO utilisateur (nom, prenom, email, motdepasse, salt) VALUES (%s, %s, %s, %s, %s)", 
-                            (nom, prenom, email, hashed_password, salt))
+            cursor.execute("INSERT INTO utilisateur (nom, prenom, email, motdepasse, salt, id_banquier) VALUES (%s, %s, %s, %s, %s, %s)", 
+                            (nom, prenom, email, hashed_password, salt, id_banquier))
             self.db.db.commit()
+
+            user_id = cursor.lastrowid
+            account_number = self.generate_account_number()
+            cursor.execute("INSERT INTO compte (nom, numero, montant, id_utilisateur) VALUES (%s, %s, %s, %s)",(nom, account_number, 0, user_id))
+            self.db.db.commit()
+
             messagebox.showinfo("Succès", "Utilisateur enregistré avec succès!")
             return True
         except mysql.connector.Error as error:

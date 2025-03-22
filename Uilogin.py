@@ -7,7 +7,7 @@ from tkinter import messagebox
 class FinanceApplogin(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Application Bancaire")
+        self.title("Budget Buddy")
         self.geometry("600x500")
         self.resizable(False, False)
         self.user_id = None
@@ -117,7 +117,7 @@ class FinanceApplogin(ctk.CTk):
         motdepasse = self.admin_password_entry.get()
 
         self.admin_instance.admin_login(email, motdepasse)
-        
+
         if self.admin_instance.admin_id:
             self.admin_id = self.admin_instance.admin_id
             # add here method to go to the next step
