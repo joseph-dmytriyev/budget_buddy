@@ -3,7 +3,6 @@ import mysql.connector
 from dotenv import load_dotenv
 from database import Database
 from tkinter import messagebox
-from userconnection import User
 
 load_dotenv()
 passw = os.getenv("PASSWORD")
@@ -89,8 +88,13 @@ class FinancialReport:
             total_income = self.get_monthly_income(month, year)
             total_expenses = self.get_monthly_expenses(month, year)
 
-            if total_income is not None and total_expenses is not None:
-
+            if total_income is None and total_expenses is None:
+                messagebox.showwarning("Aucune donnée", f"Aucune donnée trouvée pour {month}/{year}.")
+                return
+            if total_income is None:
+                total_income = 0
+            if total_expenses is None:
+                total_expenses = 0
                 balance = self.get_monthly_balance(total_income, total_expenses)
                 messagebox.showinfo("Rapport financier", f"Pour {month}/{year}\nLes recettes sont : {total_income}\nLes dépenses sont : {total_expenses}\nLe solde est : {balance}" )
 
