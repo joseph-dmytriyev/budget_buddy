@@ -3,6 +3,7 @@ import random
 from database import Database
 from userconnection import User
 from tkinter import messagebox
+from UIGraphics import GraphicsPage
 
 db_instance = Database()
 user_instance = User(db_instance)
@@ -238,6 +239,22 @@ class FinanceApp(ctk.CTkFrame):
             hover_color="darkblue",
             font=("Arial", 16, "bold")
         ).pack(pady=20)
+
+        ctk.CTkButton(
+            self,
+            text="📊 Rapport Financier",
+            command=lambda: self.show_graphics_page(user_id),  # Ajoutez cette ligne
+            height=40,
+            fg_color="green",
+            hover_color="darkgreen",
+            font=("Arial", 16, "bold")
+        ).pack(pady=20)
+
+    def show_graphics_page(self, user_id):
+        for widget in self.winfo_children():
+            widget.destroy()
+        graphics_page = GraphicsPage(self, user_id, self)  
+        graphics_page.pack(fill="both", expand=True)
 
     def transaction(self, compte_id, type_operation):
         montant_input = ctk.CTkInputDialog(title="Montant", text="Entrez le montant :").get_input()
