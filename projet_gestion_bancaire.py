@@ -2,28 +2,27 @@ import customtkinter as ctk
 import random
 from database import Database
 from userconnection import User
+from tkinter import messagebox
 
 db_instance = Database()
 user_instance = User(db_instance)
 
-# Configuration de la fenêtre principale
 ctk.set_appearance_mode("dark")  
 ctk.set_default_color_theme("blue")
 
 class AdminPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, admin_id): # change made here : add admin_id
         super().__init__(parent)
+        self.admin_mode = True # set admin_mode True
         self.db = Database()
-        self.controller = controller
-        self.configure(fg_color="white")  
-
-        ctk.CTkLabel(self, text="Mode Administrateur", font=("Arial", 22, "bold"), text_color="red").pack(pady=20)
+        self.controller = controller  
+        self.admin_id = admin_id  # changes made here instantiate admin_id
+        self.configure(fg_color="white")
         
+        ctk.CTkLabel(self, text="Mode Administrateur", font=("Arial", 22, "bold"), text_color="red").pack(pady=20)
         self.frame_comptes = ctk.CTkScrollableFrame(self, width=500, height=300, fg_color="white")
         self.frame_comptes.pack(pady=20, padx=20, fill="both", expand=True)
 
-        self.charger_comptes()  
-        
         ctk.CTkButton(
             self,
             text="🚪 Déconnexion Admin",
@@ -35,9 +34,17 @@ class AdminPage(ctk.CTkFrame):
             font=("Arial", 16, "bold")
         ).pack(pady=20)
 
+        self.init_adminui() # changes here
+
+    def init_adminui(self): # add this method
+        """ To show user accounts """
+        if self.admin_id:
+            self.charger_comptes()
+        else: 
+            messagebox.showerror("Erreur", "L'utilisateur n'est pas identifié.")
+
     def charger_comptes(self):
         try:
-            
             for widget in self.frame_comptes.winfo_children():
                 widget.destroy()
            
@@ -59,7 +66,7 @@ class AdminPage(ctk.CTkFrame):
                 ctk.CTkButton(button_frame, text="💵 Dépôt", fg_color="green", hover_color="darkgreen",command=lambda id=compte_id: self.effectuer_transaction(id, "depot")).pack(side="left", padx=2)
                 ctk.CTkButton(button_frame, text="💸 Retrait", fg_color="blue", hover_color="darkblue",command=lambda id=compte_id: self.effectuer_transaction(id, "retrait")).pack(side="left", padx=2)
                 ctk.CTkButton(button_frame, text="🔄 Virement", fg_color="orange", hover_color="darkorange",command=lambda id=compte_id: self.effectuer_transaction(id, "virement")).pack(side="left", padx=2)
-                ctk.CTkButton(button_frame, text="📜 Historique", fg_color="purple", hover_color="darkpurple",command=lambda id=compte_id: self.controller.afficher_historique(id)).pack(side="left", padx=2)
+                ctk.CTkButton(button_frame, text="📜 Historique", fg_color="purple", hover_color="purple",command=lambda id=compte_id: self.controller.afficher_historique(id)).pack(side="left", padx=2)
 
         except Exception as e:
             print(f"Erreur lors du chargement des comptes : {e}")
@@ -68,17 +75,27 @@ class AdminPage(ctk.CTkFrame):
         self.controller.transaction(compte_id, type_operation)
         self.charger_comptes()  
 
-class FinanceApp(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+class FinanceApp(ctk.CTkFrame):
+    def __init__(self, parent, user_id = None):   # changed this line, add parent, user_id 
+        super().__init__(parent) 
         self.admin_mode = False
+        self.user_id = user_id # add this line
         self.db = Database()
-        self.page_accueil()  
-        self.title("Application Bancaire")
-        self.geometry("600x500")
-        self.resizable(False, False)
-        self.page_accueil()
-   
+        self.init_ui() # add this line
+        #self.page_accueil()  
+        #self.title("Application Bancaire")
+        #self.geometry("600x500")
+        #self.resizable(False, False)
+        #self.page_accueil()
+
+    def init_ui(self): # add this method
+        """to show page account """
+        self.pack(fill="both", expand = True)
+        if self.user_id:
+            self.page_compte(self.user_id)
+        else:
+            messagebox.showerror("Erreur", "L'utilisateur n'est pas identifié.")
+
     def enable_admin_mode(self):
         self.admin_mode = True
         self.show_admin_page()
