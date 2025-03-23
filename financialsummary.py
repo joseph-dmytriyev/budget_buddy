@@ -27,7 +27,7 @@ class FinancialReport:
                 SELECT SUM(montant) AS total_recettes
                 FROM transaction
                 WHERE type = 'depot'
-                    AND user_id = %s
+                    AND id_compte IN (SELECT id FROM compte WHERE id_utilisateur = %s)
                     AND MONTH(date) = %s 
                     AND YEAR(date) = %s;
             ''', (self.user_id, month, year))
@@ -57,7 +57,7 @@ class FinancialReport:
                 SELECT SUM(montant) AS total_expenses
                 FROM transaction
                 WHERE (type = 'retrait' OR type = 'transfert')
-                    AND user_id = %s
+                    AND id_compte IN (SELECT id FROM compte WHERE id_utilisateur = %s)
                     AND MONTH(date) = %s 
                     AND YEAR(date) = %s;
             ''', (self.user_id, month, year))
@@ -71,7 +71,7 @@ class FinancialReport:
             print(f"Erreur lors de l'exécution de la requête : {error}")
             return None
         finally:
-            cursor.close()  
+            cursor.close()
 
     def get_monthly_balance(self, total_income, total_expenses):
         """ Calculate the user balance for the selected month """
