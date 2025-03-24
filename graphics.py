@@ -78,6 +78,8 @@ class Graphics:
 
     def plot_monthly_distribution(self):
         """ Plot the distribution of transactions for the current month"""
+        for widget in self.parent.graph_frame.winfo_children():            
+            widget.destroy()
         current_month = datetime.now().month
         current_year = datetime.now().year
 
@@ -95,13 +97,15 @@ class Graphics:
 
         if hasattr(self, 'canvas'):        
             self.canvas.get_tk_widget().destroy()
-
+        self.fig = fig
         self.canvas = FigureCanvasTkAgg(fig, master=self.parent.graph_frame)    
         self.canvas.draw()    
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
     
     def plot_yearly_financials(self):
         """Plot the balances, expenses and income for the current year"""
+        for widget in self.parent.graph_frame.winfo_children():            
+            widget.destroy()
         current_year = datetime.now().year
         months = list(range(1, 13))
         incomes = []
@@ -131,7 +135,7 @@ class Graphics:
 
         if hasattr(self, 'canvas'):        
             self.canvas.get_tk_widget().destroy()
-
+        self.fig = fig
         self.canvas = FigureCanvasTkAgg(fig, master=self.parent.graph_frame)    
         self.canvas.draw()    
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
