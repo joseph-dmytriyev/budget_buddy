@@ -41,9 +41,16 @@ class FinanceApplogin(ctk.CTk):
         ctk.CTkLabel(self.main_frame, text="Nouvel utilisateur ?").pack(pady=10)
         ctk.CTkButton(self.main_frame, text="S'INSCRIRE", command=self.register_page).pack(pady=10)
 
-        admin_link = ctk.CTkLabel(self.main_frame, text="Admin connexion", text_color="white", cursor="hand2")
-        admin_link.pack(pady=10)
+        admin_frame = ctk.CTkFrame(self.main_frame)
+        admin_frame.pack(pady=10)
+        
+        admin_link = ctk.CTkLabel(admin_frame, text="Admin connexion", text_color="white", cursor="hand2")
+        admin_link.pack(side="left", padx=(0, 50))
         admin_link.bind("<Button-1>", lambda e: self.admin_page())
+
+        quit_link = ctk.CTkLabel(admin_frame, text="Quitter", text_color="white", cursor="hand2")
+        quit_link.pack(side="right", padx=10)
+        quit_link.bind("<Button-1>", lambda e: self.quit())
 
     def show_account_page(self, user_id):
         """Show user account page"""
@@ -165,6 +172,10 @@ class FinanceApplogin(ctk.CTk):
         self.admin_password_entry.pack(pady = 10) 
 
         ctk.CTkButton(self.main_frame, text = "SE CONNECTER", command=self.perform_admin_login).pack(pady=10)
+
+        back_link = ctk.CTkLabel(self.main_frame, text="Retour à la page de connexion", text_color="white", cursor="hand2")
+        back_link.pack(pady=10)
+        back_link.bind("<Button-1>", lambda e: self.go_to_login_page())
         
     def perform_admin_login(self):
         """Perform admin login when all conditions are ok"""
