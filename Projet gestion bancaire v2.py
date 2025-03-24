@@ -308,8 +308,6 @@ class FinanceApp(ctk.CTk):
            self.page_compte(compte_id)
     
     def filtre(self, value, compte_id):
-        transactions = []
-        
         try:    
             cursor = db.cursor()
             cursor.execute("SELECT reference, type, montant, date FROM transaction WHERE id_compte = %s AND type = %s ORDER BY date DESC", (compte_id, value))
@@ -323,20 +321,16 @@ class FinanceApp(ctk.CTk):
             print(f"Erreur lors de la récupération des transactions : {e}")
             transactions = []
     
-        # label historique 
-        ctk.CTkLabel(self, text="Historique des Transactions", font=("Arial", 22, "bold")).pack(pady=20)
-    
-        #  cadre historique 
-        frame_historique = ctk.CTkScrollableFrame(self, width=500, height=300)
-        frame_historique.pack(pady=20, padx=20, fill="both", expand=True)
-    
+        for widget in self.frame_historique.winfo_children():
+            widget.destroy()
+
         # Affiche transactions
         if transactions:
             for reference, type_transaction, montant, date in transactions:
-                ctk.CTkLabel(frame_historique, text=f"{date} - Réf: {reference} - {type_transaction} : {montant} €",
+                ctk.CTkLabel(self.frame_historique, text=f"{date} - Réf: {reference} - {type_transaction} : {montant} €",
                          font=("Arial", 18)).pack(pady=5, anchor="w")
         else:
-            ctk.CTkLabel(frame_historique, text="Aucune transaction trouvée", font=("Arial", 18, "bold"), text_color="red").pack(pady=20)
+            ctk.CTkLabel(self.frame_historique, text="Aucune transaction trouvée", font=("Arial", 18, "bold"), text_color="red").pack(pady=20)
             
 
     def afficher_historique(self, compte_id):
@@ -344,8 +338,9 @@ class FinanceApp(ctk.CTk):
         for widget in self.winfo_children():
             widget.destroy()
 
-        combobox = ctk.CTkComboBox(master=app, values=["dépot", "retrait", "virement"])
+        ctk.CTkLabel(self, text="Historique des Transactions", font=("Arial", 22, "bold")).pack(pady=20)
 
+        combobox = ctk.CTkComboBox(master=app, values=["dépot", "retrait", "virement"])
         combobox.pack(padx=20, pady=10)
         combobox.set("dépot")
         
@@ -358,6 +353,11 @@ class FinanceApp(ctk.CTk):
             hover_color="darkblue",
             font=("Arial", 16, "bold")
         ).pack(pady=20)
+
+        self.frame_historique = ctk.CTkScrollableFrame(self, width=500, height=300)
+        self.frame_historique.pack(pady=20, padx=20, fill="both", expand=True)
+        self.filtre(combobox.get(), compte_id)
+
         ctk.CTkButton(
             self,
             text="↩ Retour",
