@@ -91,10 +91,7 @@ class FinancialReport:
             if total_income is None and total_expenses is None:
                 messagebox.showwarning("Aucune donnée", f"Aucune donnée trouvée pour {month}/{year}.")
                 return
-            if total_income is None:
-                total_income = 0
-            if total_expenses is None:
-                total_expenses = 0
+            if total_income is not None and total_expenses is not None:
                 balance = self.get_monthly_balance(total_income, total_expenses)
                 messagebox.showinfo("Rapport financier", f"Pour {month}/{year}\nLes recettes sont : {total_income}\nLes dépenses sont : {total_expenses}\nLe solde est : {balance}" )
 

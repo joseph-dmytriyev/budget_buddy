@@ -240,6 +240,13 @@ class FinanceApp(ctk.CTkFrame):
             font=("Arial", 16, "bold")
         ).pack(pady=20)
 
+        ctk.CTkButton(
+            self,
+            text="📊 Rapport Financier",
+            command=lambda: self.show_graphics_page(user_id),  
+            height=20,
+            font=("Arial", 12, "bold")
+        ).pack(pady=20)
 
     # command=lambda: self.show_graphics_page(user_id), # command for the display graph button
 
