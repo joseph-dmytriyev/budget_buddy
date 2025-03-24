@@ -320,36 +320,57 @@ class FinanceApp(ctk.CTkFrame):
         else:
            self.page_account(account_id)
     
-    def show_historical(self, account_id):
-        for widget in self.winfo_children():
-            widget.destroy()
-    
-        try: 
-            cursor = self.db.get_cursor()
-            cursor.execute("SELECT reference, type, montant, date FROM transaction WHERE id_compte = %s ORDER BY date DESC", (account_id,))
+    def filtered(self, value, account_id):
+        try:    
+            cursor = self.db.db.cursor()
+            cursor.execute("SELECT reference, type, montant, date FROM transaction WHERE id_compte = %s AND type = %s ORDER BY date DESC", (account_id, value))
             transactions = cursor.fetchall()
             cursor.close()
-            # Vérification
+    
+            # Verification
             print("Transactions récupérées :", transactions)
+    
         except Exception as e:
             print(f"Erreur lors de la récupération des transactions : {e}")
             transactions = []
     
-        # label historique 
-        ctk.CTkLabel(self, text="Historique des Transactions", font=("Arial", 22, "bold")).pack(pady=20)
-    
-        #  cadre historique 
-        frame_historical = ctk.CTkScrollableFrame(self, width=500, height=300)
-        frame_historical.pack(pady=20, padx=20, fill="both", expand=True)
-    
-        # Affiche transactions
+        for widget in self.frame_historic.winfo_children():
+            widget.destroy()
+
+        # Print transactions
         if transactions:
-            for reference, type_transaction, montant, date in transactions:
-                ctk.CTkLabel(frame_historical, text=f"{date} - Réf: {reference} - {type_transaction} : {montant} €",
+            for reference, type_transaction, amount, date in transactions:
+                ctk.CTkLabel(self.frame_historic, text=f"{date} - Réf: {reference} - {type_transaction} : {amount} €",
                          font=("Arial", 18)).pack(pady=5, anchor="w")
         else:
-            ctk.CTkLabel(frame_historical, text="Aucune transaction trouvée", font=("Arial", 18, "bold"), text_color="red").pack(pady=20)
+            ctk.CTkLabel(self.frame_historic, text="Aucune transaction trouvée", font=("Arial", 18, "bold"), text_color="red").pack(pady=20)
             
+
+    def show_historical(self, account_id):
+        
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        ctk.CTkLabel(self, text="Historique des Transactions", font=("Arial", 22, "bold")).pack(pady=20)
+
+        combobox = ctk.CTkComboBox(master = self, values=["dépot", "retrait", "virement"])
+        combobox.pack(padx=10, pady=5)
+        combobox.set("dépot")
+        
+        ctk.CTkButton(
+            self,
+            text="Rechercher",
+            command=lambda: self.filtered(combobox.get(), account_id),
+            height=40,
+            fg_color="blue",
+            hover_color="darkblue",
+            font=("Arial", 16, "bold")
+        ).pack(pady=20)
+
+        self.frame_historic = ctk.CTkScrollableFrame(self, width=400, height=150)
+        self.frame_historic.pack(pady=20, padx=20, fill="both", expand=True)
+        self.filtered(combobox.get(), account_id)
+
         ctk.CTkButton(
             self,
             text="↩ Retour",
