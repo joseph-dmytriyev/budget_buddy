@@ -241,6 +241,14 @@ class FinanceApp(ctk.CTkFrame):
         ).pack(pady=20)
 
 
+    # command=lambda: self.show_graphics_page(user_id), # command for the display graph button
+
+    def show_graphics_page(self, user_id):
+        for widget in self.winfo_children():
+            widget.destroy()
+        graphics_page = GraphicsPage(self, user_id, self)  
+        graphics_page.pack(fill="both", expand=True)        
+
     def transaction(self, compte_id, type_operation):
         montant_input = ctk.CTkInputDialog(title="Montant", text="Entrez le montant :").get_input()
         if not montant_input or not montant_input.isdigit():
