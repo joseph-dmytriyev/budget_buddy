@@ -244,6 +244,7 @@ class FinanceApp(ctk.CTkFrame):
     # command=lambda: self.show_graphics_page(user_id), # command for the display graph button
 
     def show_graphics_page(self, user_id):
+        """To perform the display of GraphicsPage"""
         for widget in self.winfo_children():
             widget.destroy()
         graphics_page = GraphicsPage(self, user_id, self)  
