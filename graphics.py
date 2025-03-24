@@ -5,15 +5,16 @@ from tkinter import messagebox
 from dotenv import load_dotenv
 from datetime import datetime
 from database import Database
-from userconnection import User
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 load_dotenv()
 pasw = os.getenv("PASSWORD")
 
 class Graphics:
-    def __init__(self, db : Database, user_id : int):
+    def __init__(self, db : Database, user_id : int, parent = None):
         self.db = db
         self.user_id = user_id
+        self.parent = parent
 
     def get_monthly_income(self, month: int, year: int):
         "To get the user income for the selected month"
@@ -22,8 +23,8 @@ class Graphics:
             cursor.execute('''
             SELECT SUM(montant) AS total_income
                 FROM transaction
-                WHERE type = 'depot'
-                AND user_id = %s
+                WHERE type = 'dépot'
+                AND id_compte IN (SELECT id FROM compte WHERE id_utilisateur = %s)
                 AND MONTH(date) = %s
                 AND YEAR(date) = %s;
                 ''', (self.user_id, month, year))
@@ -42,8 +43,8 @@ class Graphics:
             cursor.execute('''
             SELECT SUM(montant) AS total_expenses
                 FROM transaction
-                WHERE(type = 'retrait' OR type = 'transfert')
-                AND user_id = %s
+                WHERE(type = 'retrait' OR type = 'virement')
+                AND id_compte IN (SELECT id FROM compte WHERE id_utilisateur = %s)
                 AND MONTH(date) = %s
                 AND YEAR(date) = %s; 
             ''', (self.user_id, month, year))
@@ -63,7 +64,7 @@ class Graphics:
                 SELECT SUM(montant) AS total_amount
                     FROM transaction
                     WHERE type = %s
-                    AND user_id = %s
+                    AND id_compte IN (SELECT id FROM compte WHERE id_utilisateur = %s)
                     AND MONTH(date) = %s
                     AND YEAR(date) = %s;     
             ''', (trans_type, self.user_id, month, year))
@@ -75,14 +76,37 @@ class Graphics:
         finally:
             cursor.close()
 
+    def plot_monthly_distribution(self):
+        """ Plot the distribution of transactions for the current month"""
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+
+        transaction_types = ['depot', 'retrait', 'virement']
+        amounts = []
+
+        for trans_type in transaction_types:
+            total_amount = self.get_monthly_transaction_total(trans_type, current_month, current_year)
+            amounts.append(total_amount)
+
+        fig, ax = plt.subplots(figsize=(5, 5))
+        ax.pie(amounts, labels=transaction_types, autopct='%1.1f%%', startangle=140, pctdistance=0.85)
+        ax.set_title(f"Répartition des transactions pour {datetime.now().strftime('%B %Y')}")
+        ax.axis('equal')
+
+        if hasattr(self, 'canvas'):        
+            self.canvas.get_tk_widget().destroy()
+
+        self.canvas = FigureCanvasTkAgg(fig, master=self.parent.graph_frame)    
+        self.canvas.draw()    
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
+    
     def plot_yearly_financials(self):
         """Plot the balances, expenses and income for the current year"""
-       
         current_year = datetime.now().year
-        months = list(range(1,13))
+        months = list(range(1, 13))
         incomes = []
         expenses = []
-        balances =[]
+        balances = []
 
         for month in months:
             total_income = self.get_monthly_income(month, current_year)
@@ -93,37 +117,21 @@ class Graphics:
             expenses.append(total_expenses)
             balances.append(monthly_balance)
 
-        plt.figure(figsize=(10,6))
-        plt.plot(months, incomes, label='Recettes', color='green', marker='o')
-        plt.plot(months, expenses, label='Dépenses', color='red', marker='o')
-        plt.plot(months, balances, label="Solde", color='blue', marker='o')
-        plt.title(f"Aperçu financier des recettes, dépenses et solde pour {current_year}")
-        plt.xlabel('Mois')
-        plt.ylabel('Montant')
-        plt.xticks(months, ['Janv', 'Févr', 'Mars', 'Avr', 'Mai', 'Juin', 'Juill', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'])
-        plt.legend()
-        plt.grid()
-        plt.tight_layout()
-        plt.show()
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(months, incomes, label='Recettes', color='green', marker='o')
+        ax.plot(months, expenses, label='Dépenses', color='red', marker='o')
+        ax.plot(months, balances, label="Solde", color='blue', marker='o')
+        ax.set_title(f"Aperçu financier des recettes, dépenses et solde pour {current_year}")
+        ax.set_xlabel('Mois')
+        ax.set_ylabel('Montant')
+        ax.set_xticks(months)
+        ax.set_xticklabels(['Janv', 'Févr', 'Mars', 'Avr', 'Mai', 'Juin', 'Juill', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'])
+        ax.legend()
+        ax.grid()
 
-    def plot_monthly_distribution(self):
-        """ Plot the distribution of transactions for the current month"""
+        if hasattr(self, 'canvas'):        
+            self.canvas.get_tk_widget().destroy()
 
-        current_month = datetime.now().month
-        current_year = datetime.now().year
-
-        transaction_types = ['depot', 'retrait', 'transfert']
-        amounts = []
-
-        for trans_type in transaction_types:
-            total_amount = self.get_monthly_transaction_total(trans_type, current_month, current_year)
-            amounts.append(total_amount)
-        
-        plt.figure(figsize=(8,8))
-        plt.pie(amounts, labels=transaction_types, autopct='%1.1f%%', startangle=140, pctdistance=0.85 )
-        plt.title(f'Distribution des transactions pour {datetime.now().strftime("%B %Y")}')
-        plt.axis('equal')
-        plt.tight_layout()
-        plt.show()
-
-    
+        self.canvas = FigureCanvasTkAgg(fig, master=self.parent.graph_frame)    
+        self.canvas.draw()    
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
