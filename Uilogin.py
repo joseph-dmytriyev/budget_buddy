@@ -103,32 +103,39 @@ class FinanceApplogin(ctk.CTk):
 
     def register_page(self):
         """Ui register page"""
-        for widget in self.winfo_children():
+        for widget in self.main_frame.winfo_children():
             widget.destroy()
 
-        ctk.CTkLabel(self, text = "Créer un compte", font=("Arial", 24, "bold")).pack(pady=25)
+        ctk.CTkLabel(self.main_frame, text="Créer un compte", font=("Arial", 24, "bold")).pack(pady=25)
         
-        ctk.CTkLabel(self, text = "Nom").pack(pady=5)
-        self.name_entry = ctk.CTkEntry(self)
+        ctk.CTkLabel(self.main_frame, text = "Nom").pack(pady=5)
+        self.name_entry = ctk.CTkEntry(self.main_frame)
         self.name_entry.pack(pady = 5)
 
-        ctk.CTkLabel(self, text="Prénom").pack(pady=5)
-        self.surname_entry = ctk.CTkEntry(self)
+        ctk.CTkLabel(self.main_frame, text="Prénom").pack(pady=5)
+        self.surname_entry = ctk.CTkEntry(self.main_frame)
         self.surname_entry.pack(pady= 5)
 
-        ctk.CTkLabel(self, text="Email").pack(pady=5)
-        self.register_email_entry = ctk.CTkEntry(self)
+        ctk.CTkLabel(self.main_frame, text="Email").pack(pady=5)
+        self.register_email_entry = ctk.CTkEntry(self.main_frame)
         self.register_email_entry.pack(pady= 5)
 
-        ctk.CTkLabel(self, text= "Mot de passe").pack(pady=5)
-        self.register_password_entry = ctk.CTkEntry(self, show="*")
+        ctk.CTkLabel(self.main_frame, text= "Mot de passe").pack(pady=5)
+        self.register_password_entry = ctk.CTkEntry(self.main_frame, show="*")
         self.register_password_entry.pack(pady=5)
 
-        ctk.CTkButton(self, text="S'INSCRIRE", command=self.create_account).pack(pady=15)
+        ctk.CTkButton(self.main_frame, text="S'INSCRIRE", command=self.create_account).pack(pady=15)
 
-        back_link = ctk.CTkLabel(self, text="Retour à la page de connexion", text_color="white", cursor="hand2")
+        back_link = ctk.CTkLabel(self.main_frame, text="Retour à la page de connexion", text_color="white", cursor="hand2")
         back_link.pack(pady=10)
-        back_link.bind("<Button-1>", lambda e: self.login_page())
+        back_link.bind("<Button-1>", lambda e: self.go_to_login_page())
+
+    def go_to_login_page(self):
+        """Navigate to login page"""
+        try:
+            self.login_page()
+        except Exception as e:
+            print(f"Erreur lors de la navigation vers la page de connexion : {e}")
 
     def create_account(self):
         """To register the new user in database"""
