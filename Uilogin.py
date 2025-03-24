@@ -58,7 +58,7 @@ class FinanceApplogin(ctk.CTk):
             if hasattr(self, 'main_frame') and self.main_frame.winfo_exists():
                 for widget in self.main_frame.winfo_children():
                     widget.destroy()
-                finance_app = FinanceApp(self.main_frame, user_id)
+                finance_app = FinanceApp(self.main_frame, user_id, logout_callback=self.login_page)
                 finance_app.pack(fill="both", expand=True)
             else:
                 raise AttributeError("self.main_frame n'existe pas ou a été détruit.")
@@ -76,6 +76,7 @@ class FinanceApplogin(ctk.CTk):
             if hasattr(self, 'main_frame') and self.main_frame.winfo_exists():
                 for widget in self.main_frame.winfo_children():
                     widget.destroy()
+                
                 admin_page = AdminPage(self.main_frame, self, admin_id) 
                 admin_page.pack(fill="both", expand=True)
             else:
@@ -86,6 +87,8 @@ class FinanceApplogin(ctk.CTk):
             self.main_frame = ctk.CTkFrame(self, fg_color="white")
             self.main_frame.pack(fill="both", expand=True)
             self.show_admin_page(admin_id)
+            
+    
     
     def disable_admin_mode(self):
         """ Disable admin mode """

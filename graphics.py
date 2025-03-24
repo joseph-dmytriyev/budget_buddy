@@ -90,7 +90,7 @@ class Graphics:
             total_amount = self.get_monthly_transaction_total(trans_type, current_month, current_year)
             amounts.append(total_amount)
 
-        fig, ax = plt.subplots(figsize=(5, 5))
+        fig, ax = plt.subplots(figsize=(3, 3))
         ax.pie(amounts, labels=transaction_types, autopct='%1.1f%%', startangle=140, pctdistance=0.85)
         ax.set_title(f"Répartition des transactions pour {datetime.now().strftime('%B %Y')}")
         ax.axis('equal')
@@ -121,7 +121,7 @@ class Graphics:
             expenses.append(total_expenses)
             balances.append(monthly_balance)
 
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(7, 3))
         ax.plot(months, incomes, label='Recettes', color='green', marker='o')
         ax.plot(months, expenses, label='Dépenses', color='red', marker='o')
         ax.plot(months, balances, label="Solde", color='blue', marker='o')
